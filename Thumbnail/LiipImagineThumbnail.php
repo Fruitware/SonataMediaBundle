@@ -15,20 +15,21 @@ use Sonata\MediaBundle\Model\MediaInterface;
 use Sonata\MediaBundle\Provider\MediaProviderInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
+use Liip\ImagineBundle\Imagine\Cache\CacheManager;
 
 class LiipImagineThumbnail implements ThumbnailInterface
 {
     /**
-     * @var RouterInterface
+     * @var CacheManager
      */
-    protected $router;
+    private $cacheManager;
 
     /**
-     * @param RouterInterface $router
+     * @param CacheManager    $cacheManager
      */
-    public function __construct(RouterInterface $router)
+    public function __construct(CacheManager $cacheManager)
     {
-        $this->router = $router;
+        $this->cacheManager = $cacheManager;
     }
 
     /**
@@ -44,12 +45,7 @@ class LiipImagineThumbnail implements ThumbnailInterface
 
         $path = $provider->getCdnPath($path, $media->getCdnIsFlushable());
 
-        $params = array(
-            'path' => ltrim($path, '/'),
-            'filter' => $format,
-        );
-
-        return $this->router->generate('liip_imagine_filter', $params, UrlGeneratorInterface::ABSOLUTE_URL);
+        return $this->cacheManager->getBrowserPath($path, $format);
     }
 
     /**
